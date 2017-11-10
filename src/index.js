@@ -105,19 +105,21 @@ class Game extends React.Component {
     const winner = calculateWinner(current.squares);
 
     const moves = history.map((step, move) => {
+      const position = " =====  (column,row): (" + history[move].col + " , " + history[move].row +
+      ") ***player: " + history[move].player;
       const desc = move ?
         'Go to move #' + move :
         'Go to game start';
       return (
         <li key={move}>
-          <button className ="btn btn-primary" onClick={() => this.jumpTo(move)}>{desc}</button>
+          <button className ="btn btn-primary" onClick={() => this.jumpTo(move)}>{desc + position}</button>
         </li>
       );
     });
 
     let status;
     if(winner){
-      status = "the winner is " + winner;
+      status = "The winner is " + winner;
     }else{
       status = 'Next player: ' + (this.state.xIsNext? "X" : "O");
     }
@@ -135,7 +137,7 @@ class Game extends React.Component {
           </div>
           <hr/>
           <div className="game-info">
-            <div>{ status }</div>
+              <div><h1><strong>{ status }</strong></h1></div>
             <ol>{moves}</ol>
           </div>
       </div>
@@ -153,7 +155,10 @@ class Game extends React.Component {
     }
     squares[i] = this.state.xIsNext? "X" : "O";
     this.setState({
-        history: history.concat([{ squares: squares }]),
+        history: history.concat([{ squares: squares,
+                                    col: i%3 + 1,
+                                    row: (i/3 + 1)|0,
+                                    player: this.state.xIsNext? "X":"O",}]),
         stepNumber : history.length,
         xIsNext:!this.state.xIsNext,
     });
@@ -173,6 +178,7 @@ class Game extends React.Component {
               squares: Array(9).fill(null),
               row: null,
               col: null,
+              player: "unknow",
           }],
           stepNumber: 0,
           xIsNext: true,
