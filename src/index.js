@@ -23,7 +23,7 @@ function Square(props) {
 
 function SortButton(props) {
     return(
-        <button className="btn" onClick={props.onclick}>
+        <button className="btn" onClick={props.onClick}>
             {props.value}
         </button>
     );
@@ -161,19 +161,41 @@ class Game extends React.Component {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares, current.row, current.col);
-
-    const moves = history.map((step, move) => {
-      const position = " =====  (row,column): (" + history[move].row + " , " + history[move].col +
-      ") ***player: " + history[move].player;
-      const desc = move ?
-        'Go to move #' + move + position :
-        'Go to game start';
-      return (
-        <li key={move}>
-          <button className ="btn btn-primary" onClick={() => this.jumpTo(move)}>{desc}</button>
-        </li>
-      );
-    });
+    let  moves;
+    if(this.state.isAscending){
+        moves = history.map((step, move) => {
+            const position = " =====  (row,column): (" + history[move].row + " , " + history[move].col +
+                ") ***player: " + history[move].player;
+            const desc = move ?
+                'Go to move #' + move + position :
+                'Go to game start';
+            return (
+                <li key={move}>
+                    <button className ="btn btn-primary" onClick={() => this.jumpTo(move)}>{desc}</button>
+                </li>
+            );
+        });
+    }else{
+        const newHistory = [].concat(history)
+            .reverse();
+        // console.log(newHistory);
+        const length = newHistory.length;
+        console.log(length);
+        moves = newHistory.map((step, move) => {
+            const newMove =length - move - 1;
+            console.log("           " + move);
+            const position = " =====  (row,column): (" + newHistory[move].row + " , " + newHistory[move].col +
+                ") ***player: " + newHistory[move].player;
+            const desc = newMove ?
+                'Go to move #' + newMove + position :
+                'Go to game start';
+            return (
+                <li key={move}>
+                    <button className ="btn btn-primary" onClick={() => this.jumpTo(newMove)}>{desc}</button>
+                </li>
+            );
+        });
+    }
 
     let status;
     if(winner){
@@ -204,7 +226,7 @@ class Game extends React.Component {
               <SortButton
                 value={"sort"}
                 onClick={()=> this.sortButtonClick()}/>
-            <ol>{moves}</ol>
+            <ol className="list_history">{moves}</ol>
           </div>
       </div>
     );
@@ -235,6 +257,7 @@ class Game extends React.Component {
     });
   }
   jumpTo(step){
+    this.
     this.setState({
       stepNumber: step,
       xIsNext: (step % 2) === 0,
@@ -259,21 +282,7 @@ class Game extends React.Component {
           alert("vui long nhap lai size");
   }
   sortButtonClick(){
-    let x = 0;
-    var items = $('.alphaList > li').get();
-    items.sort(function(a,b){
-      var keyA = $(a).text();
-      var keyB = $(b).text();
-
-      if (keyA < keyB) return -1;
-      if (keyA > keyB) return 1;
-      return 0;
-    });
-    var ul = $('.alphaList');
-    $.each(items, function(i, li){
-      ul.append(li); /* This removes li from the old spot and moves it */
-    });
-
+      alert("click");
     this.setState({
         isAscending: !this.state.isAscending,
     })
