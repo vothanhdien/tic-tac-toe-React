@@ -2,13 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-// class sizeInput extends React.Component{
-//     render(){
-//         return <div>
-//
-//         </div>
-//     }
-// }
+
 var MAX = 5;
 
 function Row(props) {
@@ -22,6 +16,14 @@ function Row(props) {
 function Square(props) {
     return (
         <button className="square" onClick={props.onClick}>
+            {props.value}
+        </button>
+    );
+}
+
+function SortButton(props) {
+    return(
+        <button className="btn" onClick={props.onclick}>
             {props.value}
         </button>
     );
@@ -42,6 +44,7 @@ class InputBoardSize extends React.Component{
 class Board extends React.Component {
   renderSquare(i) {
     return <Square
+        key = {i}
         value = {this.props.squares[i]}
         onClick={() => this.props.onClick(i)}/>;
   }
@@ -70,15 +73,86 @@ class Board extends React.Component {
 }
 //rewrite
 function calculateWinner(squares, row, col) {
-    const width = squares.length
-    let listHorizon
-    // for (let i = 0; i < lines.length; i++) {
-    //     const [a, b, c] = lines[i];
-    //     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-    //         return squares[a];
-    //     }
-    // }
-    return null;
+    const width = Math.sqrt(squares.length);
+    const index = row * width + col;
+
+    let winner = null;
+
+    // hang ngang
+    let list = [];
+    for(let i = row * width; i < row * width + width; i++) {
+        list.push(squares[i]);
+    }
+    winner = containWin(list,squares[index]);
+
+    if(winner){
+        return winner;
+    }
+
+    //hang doc
+    list=[];
+
+    for(let i = col; i < width * width; i += width){
+        list.push(squares[i]);
+    }
+
+    winner = containWin(list,squares[index]);
+    if(winner)
+        return winner;
+
+
+    let min = col > row ? row: col;
+    let max = col > row ? col: row;
+    let d = width - max - 1;
+    //cheo xuoi
+    list =[];
+
+    let minval = (row - min) * width + (col - min);
+
+    let maxval = (row + d) * width + (col + d);
+
+    for(let i = minval ; i <= maxval; i+= width + 1){
+        list.push(squares[i]);
+    }
+
+    winner = containWin(list,squares[index]);
+    if(winner)
+        return winner;
+
+    // cheo nguoc
+    list = [];
+    if(row + col < width){
+        minval = col + row;
+        maxval = (col + row) * width;
+    }else{
+        d = width - col - 1;
+        let newrow = row - d;
+        minval = newrow * width + width - 1;
+        maxval = width * (width - 1) + newrow;
+    }
+
+    for(let i = minval ; i <= maxval; i += width - 1){
+        list.push(squares[i]);
+    }
+    winner = containWin(list,squares[index]);
+    if(winner)
+        return winner;
+    // khong thang
+    return winner;
+}
+function containWin(listArray, player) {
+    if(listArray.length < 5)
+        return null;
+    let count = 0;
+    for(let i  = 0; i < listArray.length;i++){
+        if(listArray[i] === player){
+            if(count >= 4)
+                return player;
+            count += 1;
+        }else{
+            count = 0;
+        }
+    }
 }
 
 class Game extends React.Component {
@@ -125,7 +199,11 @@ class Game extends React.Component {
                   onClick = {()=> this.resizeButtonClick()}
               />
               <hr/>
+
               <div><h1><strong>{ status }</strong></h1></div>
+              <SortButton
+                value={"sort"}
+                onClick={()=> this.sortButtonClick()}/>
             <ol>{moves}</ol>
           </div>
       </div>
@@ -138,10 +216,12 @@ class Game extends React.Component {
     const current = history[this.state.stepNumber];
     const squares = current.squares.slice();
 
-    const width = current.length;
-    const row = (i/width + 1)|0;
-    const col = i%MAX + 1;
-    if( squares[i] || calculateWinner(squares, row, col)){
+    const row = (i / MAX)|0;
+    const col = i % MAX;
+
+    if(calculateWinner(history[history.length - 1].squares,history[history.length - 1].row,history[history.length - 1].col))
+        return;
+    if( squares[i]){
         return;
     }
     squares[i] = this.state.xIsNext? "X" : "O";
@@ -164,7 +244,6 @@ class Game extends React.Component {
   resizeButtonClick(){
       let newsize = parseInt(document.getElementById('inputSize').value,10);
       if(newsize && newsize > 4){
-        alert(newsize);
         MAX = newsize;
         this.setState({
             history :[{
@@ -179,6 +258,26 @@ class Game extends React.Component {
       }else
           alert("vui long nhap lai size");
   }
+  sortButtonClick(){
+    let x = 0;
+    var items = $('.alphaList > li').get();
+    items.sort(function(a,b){
+      var keyA = $(a).text();
+      var keyB = $(b).text();
+
+      if (keyA < keyB) return -1;
+      if (keyA > keyB) return 1;
+      return 0;
+    });
+    var ul = $('.alphaList');
+    $.each(items, function(i, li){
+      ul.append(li); /* This removes li from the old spot and moves it */
+    });
+
+    this.setState({
+        isAscending: !this.state.isAscending,
+    })
+  }
   constructor(props){
       super(props);
       this.state ={
@@ -187,9 +286,11 @@ class Game extends React.Component {
               row: null,
               col: null,
               player: "unknow",
+              winner: null,
           }],
           stepNumber: 0,
           xIsNext: true,
+          isAscending: true,
       }
   }
 }
