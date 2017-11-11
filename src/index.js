@@ -169,9 +169,10 @@ class Game extends React.Component {
             const desc = move ?
                 'Go to move #' + move + position :
                 'Go to game start';
+            const id = "history" + move;
             return (
                 <li key={move}>
-                    <button className ="btn btn-primary" onClick={() => this.jumpTo(move)}>{desc}</button>
+                    <button id = {id} className ="btn btn-primary" onClick={() => this.jumpTo(move,id)}>{desc}</button>
                 </li>
             );
         });
@@ -189,9 +190,10 @@ class Game extends React.Component {
             const desc = newMove ?
                 'Go to move #' + newMove + position :
                 'Go to game start';
+            const id = "history" + move;
             return (
                 <li key={move}>
-                    <button className ="btn btn-primary" onClick={() => this.jumpTo(newMove)}>{desc}</button>
+                    <button id ={id} className ="btn btn-primary" onClick={() => this.jumpTo(newMove,id)}>{desc}</button>
                 </li>
             );
         });
@@ -256,8 +258,10 @@ class Game extends React.Component {
         xIsNext:!this.state.xIsNext,
     });
   }
-  jumpTo(step){
-    this.
+  jumpTo(step, id){
+    if(document.getElementsByClassName('bold').length > 0)
+        document.getElementsByClassName('bold')[0].classList.remove('bold');
+    document.getElementById(id).classList.add("bold");
     this.setState({
       stepNumber: step,
       xIsNext: (step % 2) === 0,
