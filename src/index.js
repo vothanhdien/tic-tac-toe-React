@@ -319,7 +319,6 @@ class Game extends React.Component {
           alert("vui long nhap lai size");
   }
   sortButtonClick(){
-      alert("click");
     this.setState({
         isAscending: !this.state.isAscending,
     })
