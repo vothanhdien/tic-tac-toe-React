@@ -58,3 +58,6 @@ ol, ul {
 .bold{
   font-weight: bold;
 }
+.hightlight{
+  background-color: yellow;
+}

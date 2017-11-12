@@ -15,7 +15,7 @@ function Row(props) {
 
 function Square(props) {
     return (
-        <button className="square" onClick={props.onClick}>
+        <button id={props.id} className="square" onClick={props.onClick}>
             {props.value}
         </button>
     );
@@ -44,6 +44,7 @@ class InputBoardSize extends React.Component{
 class Board extends React.Component {
   renderSquare(i) {
     return <Square
+        id={"square" + i}
         key = {i}
         value = {this.props.squares[i]}
         onClick={() => this.props.onClick(i)}/>;
@@ -75,13 +76,17 @@ class Board extends React.Component {
 function calculateWinner(squares, row, col) {
     const width = Math.sqrt(squares.length);
     const index = row * width + col;
-
+    if(!squares[index])
+        return null;
     let winner = null;
 
     // hang ngang
     let list = [];
     for(let i = row * width; i < row * width + width; i++) {
-        list.push(squares[i]);
+        list.push({
+            id: "square" + i,
+            value: squares[i],
+        });
     }
     winner = containWin(list,squares[index]);
 
@@ -93,7 +98,10 @@ function calculateWinner(squares, row, col) {
     list=[];
 
     for(let i = col; i < width * width; i += width){
-        list.push(squares[i]);
+        list.push({
+            id: "square" + i,
+            value: squares[i],
+        });
     }
 
     winner = containWin(list,squares[index]);
@@ -112,7 +120,10 @@ function calculateWinner(squares, row, col) {
     let maxval = (row + d) * width + (col + d);
 
     for(let i = minval ; i <= maxval; i+= width + 1){
-        list.push(squares[i]);
+        list.push({
+            id: "square" + i,
+            value: squares[i],
+        });
     }
 
     winner = containWin(list,squares[index]);
@@ -132,7 +143,10 @@ function calculateWinner(squares, row, col) {
     }
 
     for(let i = minval ; i <= maxval; i += width - 1){
-        list.push(squares[i]);
+        list.push({
+            id: "square" + i,
+            value: squares[i],
+        });
     }
     winner = containWin(list,squares[index]);
     if(winner)
@@ -145,14 +159,34 @@ function containWin(listArray, player) {
         return null;
     let count = 0;
     for(let i  = 0; i < listArray.length;i++){
-        if(listArray[i] === player){
-            if(count >= 4)
+        if(listArray[i].value === player){
+            if(count >= 4) {
+                hightLight(listArray,i);
                 return player;
+            }
             count += 1;
         }else{
             count = 0;
         }
     }
+}
+function deHightLight() {
+    while(document.getElementsByClassName('hightlight').length > 0){
+        document.getElementsByClassName('hightlight')[0].classList.remove('hightlight');
+    }
+}
+function hightLight(listArray,i){
+
+    for(let j = i; j >= i - 4 ; j--){
+        document.getElementById(listArray[j].id).classList.add('hightlight');
+    }
+}
+
+function bold(id) {
+    if(document.getElementsByClassName('bold').length > 0)
+        document.getElementsByClassName('bold')[0].classList.remove('bold');
+    if(id!==null)
+        document.getElementById(id).classList.add("bold");
 }
 
 class Game extends React.Component {
@@ -179,12 +213,9 @@ class Game extends React.Component {
     }else{
         const newHistory = [].concat(history)
             .reverse();
-        // console.log(newHistory);
         const length = newHistory.length;
-        console.log(length);
         moves = newHistory.map((step, move) => {
             const newMove =length - move - 1;
-            console.log("           " + move);
             const position = " =====  (row,column): (" + newHistory[move].row + " , " + newHistory[move].col +
                 ") ***player: " + newHistory[move].player;
             const desc = newMove ?
@@ -236,6 +267,7 @@ class Game extends React.Component {
 
 
   handleClick(i){
+      bold(null);
     const history = this.state.history.slice(0,this.state.stepNumber + 1);
     const current = history[this.state.stepNumber];
     const squares = current.squares.slice();
@@ -259,9 +291,9 @@ class Game extends React.Component {
     });
   }
   jumpTo(step, id){
-    if(document.getElementsByClassName('bold').length > 0)
-        document.getElementsByClassName('bold')[0].classList.remove('bold');
-    document.getElementById(id).classList.add("bold");
+    deHightLight();
+    bold(id);
+
     this.setState({
       stepNumber: step,
       xIsNext: (step % 2) === 0,
@@ -269,6 +301,7 @@ class Game extends React.Component {
 
   }
   resizeButtonClick(){
+      deHightLight();
       let newsize = parseInt(document.getElementById('inputSize').value,10);
       if(newsize && newsize > 4){
         MAX = newsize;
