@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 
 
-var MAX = 5;
+var MAX = 20;
 
 function Row(props) {
     return(
@@ -33,7 +33,7 @@ class InputBoardSize extends React.Component{
     render(){
         return(
             <div className="inputBoardSize">
-                <input type="number" name="size" id="inputSize" className="form-control" min="5" step="1" required="required" title=""/>
+                <input type="number" name="size" id="inputSize" className="form-control" min="5" max="20" step="1" required="required" title=""/>
                 <button className="btn btn-danger" onClick={()=>this.props.onClick()}>Resize</button>
             </div>
         )
@@ -247,19 +247,22 @@ class Game extends React.Component {
                 onClick = {(i) => this.handleClick(i)}
               />
             </div>
+            <div className="game-info">
+              <h1><strong>{ status }</strong></h1>
+              <SortButton
+                  value={"sort list history"}
+                  onClick={()=> this.sortButtonClick()}/>
+              <ol className="list_history">{moves}</ol>
+            </div>
+
+
           </div>
           <hr/>
-          <div className="game-info">
+          <div className="footer">
+              <h2>Thay đổi kích thước bàn cờ( từ 5 - 20): </h2>
               <InputBoardSize
                   onClick = {()=> this.resizeButtonClick()}
               />
-              <hr/>
-
-              <div><h1><strong>{ status }</strong></h1></div>
-              <SortButton
-                value={"sort"}
-                onClick={()=> this.sortButtonClick()}/>
-            <ol className="list_history">{moves}</ol>
           </div>
       </div>
     );
@@ -303,7 +306,7 @@ class Game extends React.Component {
   resizeButtonClick(){
       deHightLight();
       let newsize = parseInt(document.getElementById('inputSize').value,10);
-      if(newsize && newsize > 4){
+      if(newsize && newsize > 4 && newsize < 39){
         MAX = newsize;
         this.setState({
             history :[{
@@ -319,6 +322,7 @@ class Game extends React.Component {
           alert("vui long nhap lai size");
   }
   sortButtonClick(){
+      bold(null);
     this.setState({
         isAscending: !this.state.isAscending,
     })
