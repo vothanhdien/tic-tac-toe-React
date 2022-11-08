@@ -44,10 +44,29 @@ ol, ul {
   display: flex;
   flex-direction: row;
 }
-
+.game-board{
+  padding: 5px;
+  height: 400px;
+  width: 800px;
+  overflow: auto;
+}
 .game-info {
-  margin-left: 20px;
+  height: 400px;
+  width: 700px;
+  overflow: auto;
+
+  background-color: #ebe5ff;
 }
 .btn{
   margin: 2px;
+}
+.inputBoardSize{
+  padding: 10px;
+  margin: 10px;
+}
+.bold{
+  font-weight: bold;
+}
+.hightlight{
+  background-color: yellow;
 }
